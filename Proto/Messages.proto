@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+service ClientServices {
+    rpc Ping (PingMessage) returns (PingMessage);
+}
+
+message Empty {}
+
+message PingMessage {
+    enum PingType {
+        pingRequest = 2;
+        pingResponse = 3;
+    }
+    PingType ping = 1;
+}
+
+message ChatMessage {
+    string sender = 1;
+    string reciever = 2;
+    enum MessageType {
+        message = 0;
+        inviteRequest = 1;
+    }
+    string payload = 3;
+    MessageType messagetype = 4;
+}
