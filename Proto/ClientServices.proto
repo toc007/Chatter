@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-import "Messages.proto";
-
-service ClientServices {
-    rpc Ping (PingMessage) returns (PingMessage);
-}
