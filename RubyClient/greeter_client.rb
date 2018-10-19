@@ -33,7 +33,7 @@ class Client
     @name = name
     @stub = stub
     @@numClient += 1
-    #exit unless pingServer
+    exit unless pingServer
     self.runClient
   end
 
@@ -59,31 +59,15 @@ class Client
         puts "Chatter Ruby Client"
         puts "\t:echo <msg>\t\tEchos <msg> back to client"
         puts "\t:necho <n> <msg>\tEchos <msg> back to client n times"
-      when ":q"
+      when ":q", ":quit"
         puts "Exiting chat"
         break
       when ":echo"
-        msg = Chatter::ChatMessage.new(sender: @user.to_s, reciever: "Server", payload: splitUserInput[1])
-        serverResponse = @stub.echo(msg).payload
-        puts "[Server]: #{serverResponse}"
+        self.echo(splitUserInput[1])
       when ":necho"
-        n, msg = splitUserInput[1].split(" ", 2)
-        n = n.to_i
-        puts n
-        puts msg
-        if n==0 or msg == nil then
-          puts "ur a dumbass"
-        end
-        chatMsg = Chatter::ChatMessage.new(
-          sender: @user.to_s, 
-          reciever: "Server", 
-          payload: msg, 
-          timesRepeated: n)
-          serverResponse = @stub.n_echo(chatMsg)
-          serverResponse.each {
-            |resp|
-            puts "[Server]: #{resp.payload}"
-          }
+        self.necho(splitUserInput[1])
+      when ":pingPong"
+        self.pingPong()
       # when ":w" // write chat history to a file
       # when ":wq" // write chat history to file and quit
       else
@@ -92,6 +76,57 @@ class Client
     end
   end
 
+  def echo(userMsg)
+    msg = Chatter::ChatMessage.new(
+      sender: @user.to_s, 
+      reciever: "Server", 
+      payload: userMsg)
+    serverResponse = @stub.echo(msg).payload
+    puts "[Server]: #{serverResponse}"
+  end
+
+  def necho(userMsg)
+    n, msg = userMsg.split(" ", 2)
+    n = n.to_i
+    puts n
+    puts msg
+    if n==0 or msg == nil then
+      puts "ur a dumbass"
+      return
+    end
+    chatMsg = Chatter::ChatMessage.new(
+      sender: @user.to_s, 
+      reciever: "Server", 
+      payload: msg, 
+      timesRepeated: n)
+      serverResponse = @stub.n_echo(chatMsg)
+      serverResponse.each {
+        |resp|
+        puts "[Server]: #{resp.payload}"
+      }
+  end
+
+  def pingPong
+    puts "starting pingPong"
+    userin = $stdin.gets
+    loop do
+      userin = userin.chomp
+      break unless userin != "stop"
+      chatMsg = [Chatter::ChatMessage.new(
+        sender: @user.to_s
+      )]
+      serverResponse = @stub.ping_pong(chatMsg)
+      while true
+        begin
+          resp = serverResponse.next
+          puts "[Server]: #{resp.payload}"
+        rescue StopIteration
+          break
+        end
+      end
+      userin = $stdin.gets
+    end
+  end
 
   def sendMsg(msgToSend)
     puts "[#{@name}]: #{msgToSend}"

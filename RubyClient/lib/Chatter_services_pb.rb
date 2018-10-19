@@ -18,6 +18,7 @@ module Chatter
       rpc :Ping, Empty, Empty
       rpc :Echo, ChatMessage, ChatMessage
       rpc :nEcho, ChatMessage, stream(ChatMessage)
+      rpc :PingPong, stream(ChatMessage), stream(ChatMessage)
     end
 
     Stub = Service.rpc_stub_class

@@ -9,6 +9,8 @@ service ServerServices {
     rpc Echo (ChatMessage) returns (ChatMessage);
 
     rpc nEcho (ChatMessage) returns (stream ChatMessage);
+
+    rpc PingPong (stream ChatMessage) returns (stream ChatMessage);
 }
 
 // Empty request

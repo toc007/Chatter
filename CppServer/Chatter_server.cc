@@ -28,37 +28,64 @@
 #include "Chatter.grpc.pb.h"
 #endif
 
+using Chatter::ChatMessage;
+using Chatter::Empty;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
+using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
-using Chatter::Empty;
-using Chatter::ChatMessage;
 
 // Logic and data behind the server's behavior.
-class GreeterServiceImpl final : public Chatter::ServerServices::Service {
+class GreeterServiceImpl final : public Chatter::ServerServices::Service
+{
 public:
-  explicit GreeterServiceImpl(std::string s) : serverName(s) {};
+  explicit GreeterServiceImpl(std::string s) : serverName(s){};
 
-  Status Ping(ServerContext* context, 
-              const Empty* request, 
-              Empty* response) override {
+  Status Ping(ServerContext *context,
+              const Empty *request,
+              Empty *response) override
+  {
     return Status::OK;
   }
 
-  Status Echo(ServerContext* context, 
-              const ChatMessage* request, 
-              ChatMessage* response) override {
+  Status Echo(ServerContext *context,
+              const ChatMessage *request,
+              ChatMessage *response) override
+  {
     *response = *request;
     return Status::OK;
   }
 
-  Status nEcho(ServerContext* context, 
-               const ChatMessage* request, 
-               ServerWriter<ChatMessage>* writer) override {
-    for (int i = 0; i < request->timesrepeated(); i++) {
+  Status nEcho(ServerContext *context,
+               const ChatMessage *request,
+               ServerWriter<ChatMessage> *writer) override
+  {
+    for (int i = 0; i < request->timesrepeated(); i++)
+    {
       writer->Write(*request);
+    }
+    return Status::OK;
+  }
+
+  Status PingPong(ServerContext *context,
+                  ServerReaderWriter<ChatMessage, ChatMessage> *stream) override
+  {
+    ChatMessage msg;
+    ChatMessage pingResponse;
+    ChatMessage pongResponse;
+    pingResponse.set_payload("Ping");
+    pongResponse.set_payload("Pong");
+    static int count = 0;
+    while (stream->Read(&msg)) {
+      if(count % 2 == 0) {
+        stream->Write(pingResponse);
+      }
+      else {
+        stream->Write(pongResponse);
+      }
+      count++;
     }
     return Status::OK;
   }
@@ -73,7 +100,8 @@ private:
   // }
 };
 
-void RunServer() {
+void RunServer()
+{
   std::string server_address("0.0.0.0:50051");
   GreeterServiceImpl service("I is dumb server");
 
@@ -92,7 +120,8 @@ void RunServer() {
   server->Wait();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
   RunServer();
 
   return 0;
