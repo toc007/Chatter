@@ -7,22 +7,19 @@ One to one (many may come soon) chat application using GRPC that uses a C++ serv
 - Defined messages
   - Empty (used for ping)
   - ChatMessage
-    - To/From
-      - store hash or user name?
-      - prevent man in middle attack
-    - MessageType
-      - chat request
-      - message
-    - Payload
+    - sender
+    - reciever
+    - payload
 - Defined methods
   - Ping
-  - SendMessage
+  - Echo
+  - nEcho
 
 ## C++ Server
 
-- ping client
-- forward message
-- send chat request
+- Ping: replies to the client an empty message (simple request)
+- Echo: replies the same message back to the client (simple request)
+- nEcho: replies the same message n times back to the client (server streaming)
 
 ## Ruby Client
 

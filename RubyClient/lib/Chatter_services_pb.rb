@@ -14,21 +14,10 @@ module Chatter
       self.unmarshal_class_method = :decode
       self.service_name = 'Chatter.ServerServices'
 
-      rpc :Ping, PingRequest, PingResponse
-    end
-
-    Stub = Service.rpc_stub_class
-  end
-  module ClientServices
-    class Service
-
-      include GRPC::GenericService
-
-      self.marshal_class_method = :encode
-      self.unmarshal_class_method = :decode
-      self.service_name = 'Chatter.ClientServices'
-
-      rpc :Ping, PingRequest, PingResponse
+      # Definition for the ping rpc on server-side
+      rpc :Ping, Empty, Empty
+      rpc :Echo, ChatMessage, ChatMessage
+      rpc :nEcho, ChatMessage, stream(ChatMessage)
     end
 
     Stub = Service.rpc_stub_class

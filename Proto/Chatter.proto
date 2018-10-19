@@ -3,30 +3,20 @@ syntax = "proto3";
 package Chatter;
 
 service ServerServices {
-    rpc Ping (PingRequest) returns (PingResponse);
+    // Definition for the ping rpc on server-side
+    rpc Ping (Empty) returns (Empty);
+
+    rpc Echo (ChatMessage) returns (ChatMessage);
+
+    rpc nEcho (ChatMessage) returns (stream ChatMessage);
 }
 
-service ClientServices {
-    rpc Ping (PingRequest) returns (PingResponse);
-}
-
+// Empty request
 message Empty {}
 
-message PingRequest {
-    string from = 1;
-}
-
-message PingResponse {
-    string from = 1;
-}
-
+// Wrapper for messages
 message ChatMessage {
     string sender = 1;
     string reciever = 2;
-    enum MessageType {
-        Message = 0;
-        InviteRequest = 1;
-    }
     string payload = 3;
-    MessageType messagetype = 4;
 }
