@@ -19,4 +19,5 @@ message ChatMessage {
     string sender = 1;
     string reciever = 2;
     string payload = 3;
+    int32 timesRepeated = 4;
 }

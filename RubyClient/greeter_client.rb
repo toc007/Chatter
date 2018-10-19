@@ -33,7 +33,7 @@ class Client
     @name = name
     @stub = stub
     @@numClient += 1
-    exit unless pingServer
+    #exit unless pingServer
     self.runClient
   end
 
@@ -53,7 +53,7 @@ class Client
   def runClient
     loop do
       userInput = $stdin.gets.strip
-      splitUserInput =  userInput.split
+      splitUserInput = userInput.split(' ', 2)
       case splitUserInput[0]
       when ":help", ":h"
         puts "Chatter Ruby Client"
@@ -63,7 +63,27 @@ class Client
         puts "Exiting chat"
         break
       when ":echo"
+        msg = Chatter::ChatMessage.new(sender: @user.to_s, reciever: "Server", payload: splitUserInput[1])
+        serverResponse = @stub.echo(msg).payload
+        puts "[Server]: #{serverResponse}"
       when ":necho"
+        n, msg = splitUserInput[1].split(" ", 2)
+        n = n.to_i
+        puts n
+        puts msg
+        if n==0 or msg == nil then
+          puts "ur a dumbass"
+        end
+        chatMsg = Chatter::ChatMessage.new(
+          sender: @user.to_s, 
+          reciever: "Server", 
+          payload: msg, 
+          timesRepeated: n)
+          serverResponse = @stub.n_echo(chatMsg)
+          serverResponse.each {
+            |resp|
+            puts "[Server]: #{resp.payload}"
+          }
       # when ":w" // write chat history to a file
       # when ":wq" // write chat history to file and quit
       else
@@ -71,6 +91,7 @@ class Client
       end
     end
   end
+
 
   def sendMsg(msgToSend)
     puts "[#{@name}]: #{msgToSend}"

@@ -31,10 +31,10 @@
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
+using grpc::ServerWriter;
 using grpc::Status;
 using Chatter::Empty;
-using Chatter::PingRequest;
-using Chatter::PingResponse;
+using Chatter::ChatMessage;
 
 // Logic and data behind the server's behavior.
 class GreeterServiceImpl final : public Chatter::ServerServices::Service {
@@ -42,11 +42,24 @@ public:
   explicit GreeterServiceImpl(std::string s) : serverName(s) {};
 
   Status Ping(ServerContext* context, 
-              const PingRequest* request, 
-              PingResponse* response) override {
-    std::string prefix("From ");
-    std::string suffix(" with love");
-    response->set_from(prefix + this->serverName + suffix);
+              const Empty* request, 
+              Empty* response) override {
+    return Status::OK;
+  }
+
+  Status Echo(ServerContext* context, 
+              const ChatMessage* request, 
+              ChatMessage* response) override {
+    *response = *request;
+    return Status::OK;
+  }
+
+  Status nEcho(ServerContext* context, 
+               const ChatMessage* request, 
+               ServerWriter<ChatMessage>* writer) override {
+    for (int i = 0; i < request->timesrepeated(); i++) {
+      writer->Write(*request);
+    }
     return Status::OK;
   }
 

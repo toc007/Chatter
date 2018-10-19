@@ -10,6 +10,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :sender, :string, 1
     optional :reciever, :string, 2
     optional :payload, :string, 3
+    optional :timesRepeated, :int32, 4
   end
 end
 
